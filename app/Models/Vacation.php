@@ -12,7 +12,6 @@ class Vacation extends Model
 
     use HasUuids;
     protected $fillable = [
-        'libelle',
         'heure_debut',
         'heure_fin'
     ];

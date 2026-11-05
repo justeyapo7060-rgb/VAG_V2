@@ -131,19 +131,11 @@ class CohorteController extends Controller
 
 
         public function storeApprenants(
-            Request $request,
+            CohorteRequest $request,
             Cohorte $cohorte,
             CohorteService $cohorteService
         ) {
-            $data = $request->validate([
-                'apprenants' => ['required', 'array', 'min:1'],
-                'apprenants.*' => [
-                    'required',
-                    'distinct',
-                    'exists:apprenants,id_apprenant',
-                ],
-            ]);
-
+            $data = $request->validated();
             try {
                 $cohorteService->ajouterApprenants(
                     $cohorte,

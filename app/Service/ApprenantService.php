@@ -67,7 +67,7 @@ private function generateUniqueMaricule(): string
                     throw new Exception('Formation(s) introuvable(s) : ' . $manquantes->implode(', '));
                 }
 
-                if (empty($data['status']))    $data['status'] = Apprenantstatut::PENDING;
+                if (empty($data['statut']))    $data['statut'] = Apprenantstatut::PENDING;
                 if (empty($data['matricule'])) $data['matricule'] = $this->generateUniqueMaricule();
 
                 $vacation = $vacationId
@@ -118,7 +118,7 @@ private function generateUniqueMaricule(): string
             $apprenant->update(Arr::except($data, [
                 'formations',
                 'matricule',
-                'status',
+                'statut',
                 'sexe',
                 'vacation_id'
             ]));
@@ -168,12 +168,12 @@ private function generateUniqueMaricule(): string
             if (!$apprenant) {
             throw new Exception('cette utlisateur existe pas');
             }
-            $apprenant->update(['status'=>'archived']);
+            $apprenant->update(['statut'=>'archived']);
         }
 
 
-        public function filterApprenant(string $status) {
-            $apprenant = Apprenant::where(['status'=>$status]);
+        public function filterApprenant(string $statut) {
+            $apprenant = Apprenant::where(['statut'=>$statut]);
             return $apprenant->get();
         }
 

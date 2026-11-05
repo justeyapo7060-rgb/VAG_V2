@@ -48,7 +48,7 @@ class CohorteRequest extends FormRequest
 
 
         if (! $isUpdate) {
-        $rules['id_formation'] = ['required', 'exists:vacations,id_formation'];
+        $rules['id_formation'] = ['required', 'exists:formations,id_formation'];
     }
     return $rules;
 }

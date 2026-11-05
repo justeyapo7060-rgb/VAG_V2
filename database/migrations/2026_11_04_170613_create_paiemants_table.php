@@ -15,8 +15,8 @@ return new class extends Migration
     //  Schema::create('paiements', function (Blueprint $table) {
     //     $table->uuid('id_paiement')->primary();
 
-    //     $table->foreignId('inscription_id')
-    //         ->constrained('inscriptions', 'id')
+    //     $table->foreignId('apprenant_id')
+    //         ->constrained('apprenants', 'id_apprenants')
     //         ->cascadeOnDelete();
 
     //     $table->decimal('montant_total', 12, 2)->default(0);
@@ -27,7 +27,6 @@ return new class extends Migration
 
     //     $table->integer('nombre_versement');
 
-
     //     $table->dateTime('date_paiement');
 
     //     $table->string('mode_paiement')->default('espece');
@@ -37,10 +36,6 @@ return new class extends Migration
     //     $table->string('reference_transaction')->nullable();
 
     //     $table->string('statut')->default('VALIDE');
-
-    //     $table->foreignId('inscription_id')
-    //         ->constrained('inscriptions', 'id')
-    //         ->cascadeOnDelete();
 
     //     $table->timestamps();
     // });

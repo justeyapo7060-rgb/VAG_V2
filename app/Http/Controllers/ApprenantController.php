@@ -37,8 +37,8 @@ class ApprenantController extends Controller
     }
 
     // Filtre par statut
-    if ($request->filled('status') && $request->status !== 'all') {
-        $query->where('status', $request->status);
+    if ($request->filled('statut') && $request->statut !== 'all') {
+        $query->where('statut', $request->statut);
     }
 
    $apprenants = $query

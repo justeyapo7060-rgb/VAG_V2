@@ -45,7 +45,7 @@ class ApprenantSeeder extends Seeder
         );
 
         $vacationSoir = Vacation::firstOrCreate(
-            ['libelle' => 'soir'], 
+            ['libelle' => 'Soir'], 
             ['heure_debut' => '19:00:00', 'heure_fin' => '23:00:00']
         );
 
