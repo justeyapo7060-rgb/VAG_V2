@@ -38,7 +38,7 @@ class ApprenantController extends Controller
 
     // Filtre par statut
     if ($request->filled('status') && $request->status !== 'all') {
-        $query->where('status', $request->status);
+        $query->where('statut', $request->status);
     }
 
    $apprenants = $query
@@ -48,11 +48,12 @@ class ApprenantController extends Controller
 
     $count = $query->count();
 
-    return view('apprenant.index', compact('apprenants', 'count'));
+    $formations= Apprenant::with('formations')->get();
+
+    return view('apprenant.index', compact('apprenants', 'count','formations'));
 }
      public function create()
-    {
-        
+    {  
         $selectedFormations = collect(old('formations', isset($apprenant) ? $apprenant->formations->pluck('id_formation')->all() : []))
             ->map(fn ($id) => (string) $id)->all();
         $formations = Formation::orderBy('created_at', 'asc')->get();

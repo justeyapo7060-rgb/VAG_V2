@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum Cohortestatut:string
+enum CohorteStatut:string
 {
     case PROCESSING = 'processing';
     case COMPLETED = 'completed';

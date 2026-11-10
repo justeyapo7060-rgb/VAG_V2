@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;
+namespace App\Enum;
 
 enum ModePaiement: string
 {
@@ -11,7 +11,7 @@ enum ModePaiement: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ESPECE => 'Espèces',
             self::CARTE => 'Carte bancaire',
             self::MOBILE_MONEY => 'Mobile Money',

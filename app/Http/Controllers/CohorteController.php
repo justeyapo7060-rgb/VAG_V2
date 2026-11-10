@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enum\Apprenantstatut;
+use App\Enum\ApprenantStatut;
 use App\Http\Requests\CohorteRequest;
 use App\Models\Cohorte;
 use App\Models\Formation;
@@ -76,7 +76,7 @@ class CohorteController extends Controller
 
         $tous = $cohorte->apprenants->sortBy(fn ($a) => $a->nom . ' ' . $a->prenoms);
 
-        $presents = $tous->filter(fn ($a) => $a->statut === Apprenantstatut::PROCESSING);
+        $presents = $tous->filter(fn ($a) => $a->statut === ApprenantStatut::PROCESSING);
 
         // ?tous=1 affiche tous les apprenants de la cohorte, sinon seulement les présents
         $apprenants = $request->boolean('tous') ? $tous : $presents;

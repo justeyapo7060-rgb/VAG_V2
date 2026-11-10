@@ -25,10 +25,18 @@
         @error('telephone') <span class="mt-1 block text-xs text-rose-600">{{ $message }}</span> @enderror
     </label>
 
-    <label class="block text-sm font-medium text-slate-700">Date de naissance
-        <input type="date" name="date_naissance" value="{{ old('date_naissance', isset($apprenant) && $apprenant->date_naissance ? \Carbon\Carbon::parse($apprenant->date_naissance)->format('Y-m-d') : '') }}" max="{{ now()->format('Y-m-d') }}" class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-3 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-        @error('date_naissance') <span class="mt-1 block text-xs text-rose-600">{{ $message }}</span> @enderror
-    </label>
+<label class="block text-sm font-medium text-slate-700">Date de naissance
+    <input type="text" 
+           id="datepicker1" 
+           name="date_naissance" 
+           value="{{ old('date_naissance', isset($apprenant) && $apprenant->date_naissance ? \Carbon\Carbon::parse($apprenant->date_naissance)->format('Y-m-d') : '') }}" 
+           placeholder="Sélectionnez une date..." 
+           autocomplete="off"
+           class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-3 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+    @error('date_naissance') 
+        <span class="mt-1 block text-xs text-rose-600">{{ $message }}</span> 
+    @enderror
+</label>
 
     <label class="block text-sm font-medium text-slate-700">Sexe
         <select name="sexe" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
@@ -67,13 +75,70 @@
         <div class="grid gap-5 sm:grid-cols-2">
             @foreach ($formations as $formation)
                 <label class="flex items-start gap-3 rounded-xl border border-slate-200 p-3 text-sm hover:bg-slate-50 cursor-pointer">
-                    <input type="checkbox" name="formations[]" value="{{ $formation->id_formation }}"
+                    <input type="checkbox" name="formations[]" value="{{ $formation->id_formation }}" data-prix="{{ (int) $formation->prix }}"
                            @checked(in_array((string) $formation->id_formation, $selectedFormations, true))
                            class="mt-1">
-                    <span class="block font-semibold text-slate-700">{{ $formation->intitule }}</span>
+                    <span class="block font-semibold text-slate-700">{{ $formation->intitule }}
+                        <span class="block text-xs font-normal text-slate-500">{{ number_format((int) $formation->prix, 0, ',', ' ') }} FCFA</span>
+                    </span>
                 </label>
             @endforeach
         </div>
         @error('formations') <span class="mt-1 block text-xs text-rose-600">{{ $message }}</span> @enderror
     </fieldset>
+
+    @if (($formMode ?? 'create') === 'create')
+        {{-- Premier versement (acompte) : retranché du total de l'ensemble des formations --}}
+        <fieldset class="sm:col-span-2 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4" data-paiement-box>
+            <legend class="px-2 text-sm font-semibold text-slate-700">Paiement à l’inscription (versement n°1 sur {{ \App\Service\PaiementService::MAX_VERSEMENTS }})</legend>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label class="block text-sm font-medium text-slate-700">Acompte (FCFA) <span class="text-rose-500">*</span>
+                    <input type="number" name="acompte" id="acompte" min="1" step="1" value="{{ old('acompte') }}" required
+                           class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-3 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                    @error('acompte') <span class="mt-1 block text-xs text-rose-600">{{ $message }}</span> @enderror
+                </label>
+                <label class="block text-sm font-medium text-slate-700">Mode de paiement
+                    <select name="mode_paiement" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 font-normal outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                        @foreach (\App\Enum\ModePaiement::cases() as $mode)
+                            <option value="{{ $mode->value }}" @selected(old('mode_paiement', 'espece') === $mode->value)>{{ $mode->label() }}</option>
+                        @endforeach
+                    </select>
+                </label>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Total des formations : <strong id="paiement-total">0</strong> FCFA
+                · Reste après acompte : <strong id="paiement-reste">0</strong> FCFA</p>
+            <p class="mt-1 text-xs text-slate-500">Le reste est payable librement, en 3 versements maximum, avant la fin de la cohorte.</p>
+        </fieldset>
+        <script>
+
+            document.addEventListener('DOMContentLoaded', function () {
+    // S'assure que l'élément existe bien sur la page avant d'initialiser Flatpickr
+    if (document.getElementById('datepicker1')) {
+        flatpickr("#datepicker1", {
+            dateFormat: "Y-m-d",      // Format envoyé à Laravel (AAAA-MM-JJ)
+            altInput: true,           // Affiche un format plus lisible pour l'utilisateur
+            altFormat: "d/m/Y",       // Format affiché (JJ/MM/AAAA)
+            maxDate: "today",         // Empêche de sélectionner une date future
+            locale: "fr"              // Mois et jours en français
+        });
+    }
+});
+            (function () {
+                const fmt = n => new Intl.NumberFormat('fr-FR').format(n);
+                const boxes = document.querySelectorAll('input[name="formations[]"]');
+                const acompte = document.getElementById('acompte');
+                function maj() {
+                    let total = 0;
+                    boxes.forEach(b => { if (b.checked) total += parseInt(b.dataset.prix || '0', 10); });
+                    const x = parseInt(acompte.value || '0', 10);
+                    document.getElementById('paiement-total').textContent = fmt(total);
+                    document.getElementById('paiement-reste').textContent = fmt(Math.max(0, total - x));
+                    acompte.max = total || '';
+                }
+                boxes.forEach(b => b.addEventListener('change', maj));
+                acompte.addEventListener('input', maj);
+                maj();
+            })();
+        </script>
+    @endif
 </div>

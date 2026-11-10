@@ -92,17 +92,14 @@ private function generateUniqueMaricule(string $text): string
     if($initials)
     
     // 2. Recherche de la formation qui possède le numéro le plus élevé à la fin de son code
-    $lastFormation = Formation::where('code', 'like', 'VAG-%')
-        ->orderByRaw('CAST(RIGHT(code, 5) AS UNSIGNED) DESC') // Extrait les 5 derniers caractères sous forme d'entier
-        ->first();
+    // Calcul en PHP (portable MySQL / SQLite / PostgreSQL) : pas de RIGHT()/UNSIGNED propres à MySQL.
+    $lastNumber = (int) Formation::where('code', 'like', 'VAG-%')
+        ->pluck('code')
+        ->map(fn ($c) => (int) substr($c, -5))
+        ->max();
 
-    $nextNumber = 1;
-
-    // 3. Si un code existe, on extrait son numéro final et on fait +1
-    if ($lastFormation) {
-        $lastNumber = (int) substr($lastFormation->code, -5);
-        $nextNumber = $lastNumber + 1;
-    }
+    // 3. On prend le numéro final le plus élevé et on fait +1
+    $nextNumber = $lastNumber + 1;
 
     if ($nextNumber > 10000) {
         throw new \Exception("Tous les codes possibles (10000 maximum) ont été attribués.");

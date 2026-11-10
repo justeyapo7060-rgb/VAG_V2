@@ -68,7 +68,8 @@ class ApprenantSeeder extends Seeder
                 'nationalite' => $nationalites[array_rand($nationalites)],
                 'sexe' => ($i % 2 === 0) ? 'M' : 'F',
                 'date_naissance' => '199' . rand(5, 9) . '-' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . '-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
-                'formations' => [$formationCuisine->id_formation] 
+                'formations' => [$formationCuisine->id_formation],
+                'acompte' => rand(5, 20) * 10000,
             ];
 
             try {
@@ -93,7 +94,8 @@ class ApprenantSeeder extends Seeder
                 'nationalite' => $nationalites[array_rand($nationalites)],
                 'sexe' => ($i % 2 === 0) ? 'M' : 'F',
                 'date_naissance' => '200' . rand(0, 5) . '-' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . '-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
-                'formations' => [$formationPatisserie->id_formation] 
+                'formations' => [$formationPatisserie->id_formation],
+                'acompte' => rand(5, 20) * 10000,
             ];
 
             try {
@@ -118,7 +120,8 @@ class ApprenantSeeder extends Seeder
                 'nationalite' => $nationalites[array_rand($nationalites)],
                 'sexe' => ($i % 2 === 0) ? 'F' : 'M',
                 'date_naissance' => '200' . rand(0, 4) . '-' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . '-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
-                'formations' => [$formationPatisserie->id_formation] 
+                'formations' => [$formationPatisserie->id_formation],
+                'acompte' => rand(5, 20) * 10000,
             ];
 
             try {

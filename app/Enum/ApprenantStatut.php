@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum Apprenantstatut : string
+enum ApprenantStatut : string
 {
     case PENDING = 'pending';
     case COMPLETED = 'completed';

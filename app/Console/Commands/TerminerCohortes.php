@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Enum\Apprenantstatut;
-use App\Enum\Cohortestatut;
+use App\Enum\ApprenantStatut;
+use App\Enum\CohorteStatut;
 use App\Models\Cohorte;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -20,7 +20,7 @@ class TerminerCohortes extends Command
     public function handle()
     {
        $cohortes = Cohorte::whereDate('date_fin', '<=', today())
-            ->where('statut', '!=', Cohortestatut::COMPLETED->value)
+            ->where('statut', '!=', CohorteStatut::COMPLETED->value)
             ->get();
 
         foreach ($cohortes as $cohorte) {
@@ -28,12 +28,12 @@ class TerminerCohortes extends Command
 
                 // Terminer la cohorte
                 $cohorte->update([
-                    'statut' => Cohortestatut::COMPLETED,
+                    'statut' => CohorteStatut::COMPLETED,
                 ]);
 
                 // Terminer tous les apprenants associés
                 $cohorte->apprenants()->update([
-                    'statut' => Apprenantstatut::COMPLETED->value,
+                    'statut' => ApprenantStatut::COMPLETED->value,
                 ]);
             });
 

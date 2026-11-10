@@ -30,11 +30,10 @@ return new class extends Migration
                 ->default('pending');
 
             $table->string('nationalite', 100);
-
-             $table->foreignUuid('cohorte_id')
-              ->constrained('cohortes', 'id_cohorte')
-              ->onDelete('cascade');
-              
+            $table->foreignUuid('cohorte_id')
+                ->nullable()
+                ->constrained('cohortes', 'id_cohorte')
+                ->onDelete('cascade');
              $table->foreignUuid('vacation_id')
               ->constrained('vacations', 'id_vacation')
               ->onDelete('cascade');

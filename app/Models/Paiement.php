@@ -2,17 +2,22 @@
 
 namespace App\Models;
 
+use App\Enum\ModePaiement;
 use App\Enum\PaiementStatut;
-use App\Enums\ModePaiement;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use App\Enums\StatutEnum;
 
 class Paiement extends Model
 {
+    use HasUuids;
+
     protected $primaryKey = 'id_paiement';
 
+    protected $keyType = 'string';
+
     protected $fillable = [
-        'inscription_id',
+        'id_apprenant',
+        'numero',
         'montant',
         'date_paiement',
         'mode_paiement',
@@ -23,8 +28,14 @@ class Paiement extends Model
 
     protected $casts = [
         'date_paiement' => 'datetime',
-        'montant' => 'decimal:2',
+        'montant' => 'integer',
+        'numero' => 'integer',
         'mode_paiement' => ModePaiement::class,
         'statut' => PaiementStatut::class,
     ];
+
+    public function apprenant()
+    {
+        return $this->belongsTo(Apprenant::class, 'id_apprenant', 'id_apprenant');
+    }
 }

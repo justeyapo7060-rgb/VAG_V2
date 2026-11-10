@@ -1,4 +1,4 @@
-resources/views/formations/edit.blade.php
+{{-- resources/views/formations/edit.blade.php --}}
 @extends('base')
 @section('title', 'Modifier une formation')
 @section('content')

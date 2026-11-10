@@ -2,9 +2,9 @@
 
 namespace App\Service;
 
-use App\Cohortestatut;
-use App\Enum\Apprenantstatut;
-use App\Enum\Cohortestatut as EnumCohortestatut;
+use App\CohorteStatut;
+use App\Enum\ApprenantStatut;
+use App\Enum\CohorteStatut as EnumCohorteStatut;
 use App\Http\Requests\CohorteRequest;
 use App\Models\Apprenant;
 use App\Models\Cohorte;
@@ -95,7 +95,7 @@ class CohorteService
         // Vérifier à nouveau les apprenants sélectionnés côté serveur.
         $apprenants = Apprenant::query()
             ->whereIn('id_apprenant', $idsApprenants)
-            ->where('statut', Apprenantstatut::PENDING->value)
+            ->where('statut', ApprenantStatut::PENDING->value)
             ->whereNull('cohorte_id')
             ->where('vacation_id', $vacationId)
             ->whereHas('formations', function ($query) use ($formationId) {
@@ -113,7 +113,7 @@ class CohorteService
         Apprenant::whereIn('id_apprenant', $apprenants->modelKeys())
             ->update([
                 'cohorte_id' => $cohorte->id_cohorte,
-                'statut' => Apprenantstatut::PROCESSING->value,
+                'statut' => ApprenantStatut::PROCESSING->value,
             ]);
 
         return $cohorte->fresh(['apprenants.formations', 'apprenants.vacations']);
@@ -169,7 +169,7 @@ class CohorteService
     $formationId = $formationsCommunes[0];
 
     return Apprenant::query()
-        ->where('statut', Apprenantstatut::PENDING->value)
+        ->where('statut', ApprenantStatut::PENDING->value)
         ->whereNull('cohorte_id')
         ->where('vacation_id', $vacationId)
         ->whereHas('formations', function ($query) use ($formationId) {
@@ -182,7 +182,7 @@ class CohorteService
 
     public function apprenantsEligibles(string $formationId, string $vacationId, bool $verrouiller = false)
     {
-        $query = Apprenant::where('statut', Apprenantstatut::PENDING->value)
+        $query = Apprenant::where('statut', ApprenantStatut::PENDING->value)
             ->whereNull('cohorte_id')
             ->where('vacation_id', $vacationId)
             ->whereHas('formations', fn ($q) => $q->where('formations.id_formation', $formationId))
@@ -216,7 +216,7 @@ public function createCohorte(array $data): array
 
         Apprenant::whereIn('id_apprenant', $apprenants->modelKeys())->update([
             'cohorte_id' => $cohorte->getKey(),
-            'statut'     => Apprenantstatut::PROCESSING->value,
+            'statut'     => ApprenantStatut::PROCESSING->value,
         ]);
 
         return ['cohorte' => $cohorte, 'apprenants' => $apprenants];

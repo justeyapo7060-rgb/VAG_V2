@@ -22,6 +22,10 @@ class Formation extends Model
         ];
 
 
+        protected $casts = [
+                'prix' => 'integer',
+        ];
+
         public function apprenants()
         {
                 return $this->belongsToMany(

@@ -9,11 +9,12 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/fr.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- CSS de Bootstrap 5 -->
-<link href="https://jsdelivr.net" rel="stylesheet">
+    <link href="https://jsdelivr.net" rel="stylesheet">
 
-<!-- JS de Bootstrap 5 (Requis pour faire fonctionner le modal !) -->
-<script src="https://jsdelivr.net" defer></script>
+    <!-- JS de Bootstrap 5 (Requis pour faire fonctionner le modal !) -->
+    <script src="https://jsdelivr.net" defer></script>
     <script>
         tailwind.config = {
             theme: { extend: {
@@ -107,7 +108,8 @@
                     <i data-lucide="boxes" class="h-5 w-5"></i>
                      Achats & stocks
                 </a>
-                <a href="#" class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-3 text-sm hover:bg-white/10"><i data-lucide="wallet" class="h-5 w-5"></i> Finances</a>
+                <a href="{{ route('paiement.impayes') }}" class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-3 text-sm hover:bg-white/10 {{ request()->routeIs('paiement.impayes') ? 'active' : '' }}"
+                   @if(request()->routeIs('paiement.impayes')) aria-current="page" @endif><i data-lucide="wallet" class="h-5 w-5"></i> Finances · Impayés</a>
                 <a href="#" class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-3 text-sm hover:bg-white/10"><i data-lucide="user-cog" class="h-5 w-5"></i> Personnel</a>
                 <a href="#" class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-3 text-sm hover:bg-white/10"><i data-lucide="files" class="h-5 w-5"></i> Documents</a>
                 <a href="#" class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-3 text-sm hover:bg-white/10"><i data-lucide="settings" class="h-5 w-5"></i> Paramètres</a>
@@ -147,6 +149,7 @@
     </div>
 
     <script>
+        
         (() => {
             if (window.lucide) window.lucide.createIcons();
 

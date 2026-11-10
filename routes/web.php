@@ -3,6 +3,7 @@
 use App\Http\Controllers\ApprenantController;
 use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\FormationController;
+use App\Http\Controllers\PaiementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,6 +20,10 @@ Route::prefix('formations')->name('formation.')->group(function () {
 });
 
 
+Route::get('/paiements/impayes', [PaiementController::class, 'impayes'])->name('paiement.impayes');
+Route::get('/paiements/{paiement}/invoice', [PaiementController::class, 'invoice'])->name('paiement.invoice');
+
+
 Route::prefix('apprenants')->name('apprenant.')->group(function () {
         Route::get('/', [ApprenantController::class, 'index'])->name('index');
         Route::get('/create', [ApprenantController::class, 'create'])->name('create');  
@@ -26,6 +31,9 @@ Route::prefix('apprenants')->name('apprenant.')->group(function () {
         Route::put('/archived/{apprenant}', [ApprenantController::class, 'archived'])->name('archived');              
         Route::put('/{apprenant}', [ApprenantController::class, 'update'])->name('update');                          
         Route::post('/', [ApprenantController::class, 'store'])->name('store');   
+
+        Route::get('/{apprenant}/paiements', [PaiementController::class, 'index'])->name('paiement.index');
+        Route::post('/{apprenant}/paiements', [PaiementController::class, 'store'])->name('paiement.store');
     });
 Route::resource('cohortes', CohorteController::class)->names('cohorte');
 Route::get(

@@ -2,7 +2,8 @@
 
 namespace App\Service;
 
-use App\Enum\Apprenantstatut;
+use App\Enum\ApprenantStatut;
+use App\Enum\ModePaiement;
 use App\Models\Apprenant;
 use App\Models\Formation;
 use App\Models\Vacation;
@@ -16,9 +17,9 @@ use Throwable;
 
 class ApprenantService
 {
-    /**
-     * Create a new class instance.
-     */
+    public function __construct(protected PaiementService $paiementService)
+    {
+    }
 
 
 
@@ -28,17 +29,14 @@ private function generateUniqueMaricule(): string
    $Years = date('y');
     
     // 2. Recherche de la formation qui possède le numéro le plus élevé à la fin de son code
-    $lastApprenant = Apprenant::where('matricule', 'like', 'VAG-%')
-        ->orderByRaw('CAST(RIGHT(matricule, 5) AS UNSIGNED) DESC') // Extrait les 5 derniers caractères sous forme d'entier
-        ->first();
+    // Calcul en PHP (portable MySQL / SQLite / PostgreSQL) : pas de RIGHT()/UNSIGNED propres à MySQL.
+    $lastNumber = (int) Apprenant::where('matricule', 'like', 'VAG-%')
+        ->pluck('matricule')
+        ->map(fn ($m) => (int) substr($m, -5))
+        ->max();
 
-    $nextNumber = 1;
-
-    // 3. Si un code existe, on extrait son numéro final et on fait +1
-    if ($lastApprenant) {
-        $lastNumber = (int) substr($lastApprenant->matricule, -5);
-        $nextNumber = $lastNumber + 1;
-    }
+    // 3. On prend le numéro final le plus élevé et on fait +1
+    $nextNumber = $lastNumber + 1;
 
     if ($nextNumber > 10000) {
         throw new \Exception("Tous les codes possibles (10000 maximum) ont été attribués.");
@@ -67,7 +65,15 @@ private function generateUniqueMaricule(): string
                     throw new Exception('Formation(s) introuvable(s) : ' . $manquantes->implode(', '));
                 }
 
-                if (empty($data['status']))    $data['status'] = Apprenantstatut::PENDING;
+                $acompte = (int) ($data['acompte'] ?? 0);
+                if ($acompte <= 0) {
+                    throw ValidationException::withMessages([
+                        'acompte' => 'L\'acompte à l\'inscription est obligatoire.',
+                    ]);
+                }
+                $modePaiement = ModePaiement::tryFrom((string) ($data['mode_paiement'] ?? '')) ?? ModePaiement::ESPECE;
+
+                if (empty($data['statut']))    $data['statut'] = ApprenantStatut::PENDING;
                 if (empty($data['matricule'])) $data['matricule'] = $this->generateUniqueMaricule();
 
                 $vacation = $vacationId
@@ -80,11 +86,16 @@ private function generateUniqueMaricule(): string
                     ]);
                 }
 
-                $apprenant = new Apprenant(Arr::except($data, ['formations']));       
+                $apprenant = new Apprenant(Arr::except($data, ['formations', 'acompte', 'mode_paiement']));       
                 $apprenant->vacation_id = $vacation->id_vacation;  // écrit vacation_id, sans $fillable
                 $apprenant->save();
 
                 $apprenant->formations()->sync($formationIds->all());
+
+                // Versement n°1 : l'acompte x, retranché du total de l'ensemble des formations.
+                // Lève une ValidationException (et annule l'inscription) si x > total.
+                $this->paiementService->enregistrer($apprenant, $acompte, $modePaiement);
+
                 return $apprenant->load(['formations', 'vacations']);
             });
         }
@@ -118,7 +129,7 @@ private function generateUniqueMaricule(): string
             $apprenant->update(Arr::except($data, [
                 'formations',
                 'matricule',
-                'status',
+                'statut',
                 'sexe',
                 'vacation_id'
             ]));
@@ -135,10 +146,19 @@ private function generateUniqueMaricule(): string
                         $ids = collect(Arr::wrap($data['formations']))
                             ->filter()->map(fn ($id) => (string) $id)->unique()->values()->all();
                         $apprenant->formations()->sync($ids);
+
+                        if ($apprenant->montant_total < $apprenant->total_paye) {
+                            throw ValidationException::withMessages([
+                                'formations' => 'Le total des formations ne peut pas être inférieur aux versements déjà effectués ('
+                                    . number_format($apprenant->total_paye, 0, ',', ' ') . ' FCFA).',
+                            ]);
+                        }
                     }
 
                     return $apprenant->load('formations','vacations');
                 });
+            } catch (ValidationException $e) {
+                throw $e;
             } catch (Throwable $e) {
                 Log::error("Erreur lors de la mise à jour de l'apprenant.", [
                     'exception'    => $e,
@@ -168,12 +188,12 @@ private function generateUniqueMaricule(): string
             if (!$apprenant) {
             throw new Exception('cette utlisateur existe pas');
             }
-            $apprenant->update(['status'=>'archived']);
+            $apprenant->update(['statut'=>'archived']);
         }
 
 
         public function filterApprenant(string $status) {
-            $apprenant = Apprenant::where(['status'=>$status]);
+            $apprenant = Apprenant::where(['statut'=>$status]);
             return $apprenant->get();
         }
 

@@ -10,4 +10,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 
-Schedule::command('cohortes:terminer')->everyMinute();
+Schedule::command('app:terminer-cohortes')->everyMinute();
+
+// Rappel de solde : le dernier jour de chaque mois, à 08:00.
+Schedule::command('paiements:rappel')->lastDayOfMonth('08:00');

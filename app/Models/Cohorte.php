@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enum\Cohortestatut as EnumCohortestatut;
+use App\Enum\CohorteStatut as EnumCohorteStatut;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,7 +23,7 @@ class Cohorte extends Model
      }
     
      protected $casts = [
-        'statut'=>EnumCohortestatut::class
+        'statut'=>EnumCohorteStatut::class
      ];
         public function getVacationLibelleAttribute(): ?string
     {

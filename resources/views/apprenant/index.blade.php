@@ -36,60 +36,69 @@
         })->count();
     @endphp
     <section class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3" aria-label="Statistiques des apprenants">
-        <article class="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm"><p class="text-xs text-slate-500">Apprenants actifs (page actuelle)</p><p class="mt-2 font-serif text-3xl font-bold text-atelier-ink">{{ $activeCount }}</p></article>
-        <article class="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm"><p class="text-xs text-slate-500">Total affiché</p><p class="mt-2 font-serif text-3xl font-bold text-atelier-ink">{{ method_exists($apprenants, 'total') ? $apprenants->total() : $learnersCollection->count() }}</p></article>
-        <article class="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm"><p class="text-xs text-slate-500">Page</p><p class="mt-2 font-serif text-3xl font-bold text-atelier-ink">{{ method_exists($apprenants, 'currentPage') ? $apprenants->currentPage() : 1 }}</p></article>
+        <article class="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
+            <p class="text-xs text-slate-500">Apprenants actifs (page actuelle)</p>
+            <p class="mt-2 font-serif text-3xl font-bold text-atelier-ink">{{ $activeCount }}</p>
+        </article>
+        <article class="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
+            <p class="text-xs text-slate-500">Total affiché</p>
+            <p class="mt-2 font-serif text-3xl font-bold text-atelier-ink">{{ method_exists($apprenants, 'total') ? $apprenants->total() : $learnersCollection->count() }}</p>
+        </article>
+        <article class="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
+            <p class="text-xs text-slate-500">Page</p>
+            <p class="mt-2 font-serif text-3xl font-bold text-atelier-ink">{{ method_exists($apprenants, 'currentPage') ? $apprenants->currentPage() : 1 }}</p>
+        </article>
     </section>
 
     <section class="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center" aria-label="Recherche et filtres">
         <div class="flex flex-wrap gap-3">
-<form method="GET" action="{{ route('apprenant.index') }}"
-      class="flex flex-wrap items-center gap-3">
+        <form method="GET" action="{{ route('apprenant.index') }}"
+            class="flex flex-wrap items-center gap-3">
 
-    {{-- Recherche --}}
-    <input
-        type="text"
-        name="search"
-        value="{{ request('search') }}"
-        placeholder="Rechercher un apprenant..."
-        class="min-w-[220px] rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500"
-    >
+            {{-- Recherche --}}
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Rechercher un apprenant..."
+                class="min-w-[220px] rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500"
+            >
 
-    {{-- Filtre par statut --}}
-    <select
-        id="statutFilter"
-        name="statut"
-        onchange="this.form.submit()"
-        class="min-w-[170px] rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-blue-500"
-        aria-label="Filtrer par statut">
+            {{-- Filtre par statut --}}
+            <select
+                id="statutFilter"
+                name="statut"
+                onchange="this.form.submit()"
+                class="min-w-[170px] rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-blue-500"
+                aria-label="Filtrer par statut">
 
-        <option value="all" {{ request('statut', 'all') == 'all' ? 'selected' : '' }}>
-            Tous les statuts
-        </option>
+                <option value="all" {{ request('statut', 'all') == 'all' ? 'selected' : '' }}>
+                    Tous les statuts
+                </option>
 
-        @foreach (\App\Enum\Apprenantstatut::cases() as $statutCase)
-            <option
-                value="{{ $statutCase->value }}"
-                {{ request('statut') == $statutCase->value ? 'selected' : '' }}>
-                {{ ucfirst(strtolower($statutCase->name)) }}
-            </option>
-        @endforeach
+                @foreach (\App\Enum\ApprenantStatut::cases() as $statutCase)
+                    <option
+                        value="{{ $statutCase->value }}"
+                        {{ request('statut') == $statutCase->value ? 'selected' : '' }}>
+                        {{ ucfirst(strtolower($statutCase->name)) }}
+                    </option>
+                @endforeach
 
-    </select>
+            </select>
 
-    {{-- Bouton rechercher --}}
-    <button type="submit"
-            class="rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700">
-        Rechercher
-    </button>
+            {{-- Bouton rechercher --}}
+            <button type="submit"
+                    class="rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700">
+                Rechercher
+            </button>
 
-    {{-- Réinitialiser --}}
-    <a href="{{ route('apprenant.index') }}"
-       class="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-600 hover:bg-slate-50">
-        Réinitialiser
-    </a>
+            {{-- Réinitialiser --}}
+            <a href="{{ route('apprenant.index') }}"
+            class="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-600 hover:bg-slate-50">
+                Réinitialiser
+            </a>
 
-</form>
+        </form>
 </div>
         <p id="resultCount" class="text-right text-xs text-slate-400 lg:ml-auto">{{ $learnersCollection->count() }} résultat(s) sur cette page</p>
     </section>
@@ -102,6 +111,7 @@
                     <th class="px-4 py-4 font-semibold">Apprenant</th>
                     <th class="px-4 py-4 font-semibold">Email</th>
                     <th class="px-4 py-4 font-semibold">Téléphone</th>
+                    <th class="px-4 py-4 font-semibold">Formations choisies</th> <!-- Corrigé -->        
                     <th class="px-4 py-4 font-semibold">Date de naissance</th>
                     <th class="px-4 py-4 font-semibold">Vacation choisie</th>
                     <th class="px-4 py-4 font-semibold">Statut</th>
@@ -149,6 +159,19 @@
                                 <p class="mt-1 text-xs text-slate-400">Apprenant</p></td>
                             <td class="px-4 py-4 text-xs text-slate-500">{{ $apprenant->email ?? 'Non renseigné' }}</td>
                             <td class="whitespace-nowrap px-4 py-4 text-xs text-slate-600">{{ $apprenant->telephone ?? 'Non renseigné' }}</td>
+
+                            {{-- 2. Affichage des formations (Many-to-Many) --}}
+                        <td class="px-4 py-4 text-xs text-slate-800">
+                                <div class="flex flex-col gap-1">
+                                    @forelse($apprenant->formations as $formation)
+                                        <span class="inline-block w-fit bg-slate-100 rounded px-2.5 py-1 text-slate-700">
+                                            {{ $formation->intitule }}
+                                        </span>
+                                    @empty
+                                        <span class="text-slate-400 italic">Aucune formation</span>
+                                    @endforelse
+                                </div>
+                            </td>
                             <td class="whitespace-nowrap px-4 py-4 text-xs text-slate-500">{{ $apprenant->date_naissance ? \Carbon\Carbon::parse($apprenant->date_naissance)->format('d/m/Y') : 'N/A' }}</td>
                             <td class="whitespace-nowrap px-4 py-4 text-xs text-slate-500">{{ $apprenant->vacations->libelle ?? $apprenant->vacations->intitule ?? 'Non spécifiée' }}</td>
                             <td class="px-4 py-4"><span class="inline-flex items-center gap-2
@@ -166,6 +189,12 @@
                                         <i data-lucide="eye" class="h-4 w-4"></i></a>
                                 @endif
                                 
+                                <a href="{{ route('apprenant.paiement.index', $apprenantId) }}"
+                                   class="rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-emerald-300 hover:text-emerald-600"
+                                   title="Paiements" aria-label="Paiements de {{ $apprenant->nom }}">
+                                    <i data-lucide="banknote" class="h-4 w-4"></i>
+                                </a>
+
                                 <a href="{{ route('apprenant.edit', $apprenantId) }}"
                                    class="rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-blue-300 hover:text-blue-600"
                                    title="Modifier" aria-label="Modifier {{ $apprenant->nom }}">
@@ -232,6 +261,7 @@
 
 @push('scripts')
 <script>
+    
 document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('archiveModal');
     const openButtons = document.querySelectorAll('.open-archive-modal');

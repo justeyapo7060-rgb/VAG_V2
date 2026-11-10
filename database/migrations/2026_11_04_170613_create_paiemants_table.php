@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\ModePaiement;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -8,49 +7,35 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Un paiement = un versement libre d'un apprenant.
+     * Le total dû, le reste à payer et la date limite sont calculés
+     * (formations de l'apprenant + date_fin de sa cohorte), jamais stockés.
      */
     public function up(): void
     {
-    //  Schema::create('paiements', function (Blueprint $table) {
-    //     $table->uuid('id_paiement')->primary();
+        Schema::create('paiements', function (Blueprint $table) {
+            $table->uuid('id_paiement')->primary();
 
-    //     $table->foreignId('inscription_id')
-    //         ->constrained('inscriptions', 'id')
-    //         ->cascadeOnDelete();
+            $table->foreignUuid('id_apprenant')
+                ->constrained('apprenants', 'id_apprenant')
+                ->cascadeOnDelete();
 
-    //     $table->decimal('montant_total', 12, 2)->default(0);
+            $table->unsignedTinyInteger('numero');            // 1 = acompte, 2..4 = versements suivants
+            $table->unsignedBigInteger('montant');            // FCFA, entier
+            $table->dateTime('date_paiement');
+            $table->string('mode_paiement', 30)->default('espece');
+            $table->string('reference')->unique();
+            $table->string('reference_transaction')->nullable();
+            $table->string('statut', 30)->default('valide');
 
-    //     $table->decimal('versement', 12, 2);
-        
-    //     $table->decimal('reste_a_paye', 12, 2);
+            $table->timestamps();
 
-    //     $table->integer('nombre_versement');
-
-
-    //     $table->dateTime('date_paiement');
-
-    //     $table->string('mode_paiement')->default('espece');
-
-    //     $table->string('reference')->unique();
-
-    //     $table->string('reference_transaction')->nullable();
-
-    //     $table->string('statut')->default('VALIDE');
-
-    //     $table->foreignId('inscription_id')
-    //         ->constrained('inscriptions', 'id')
-    //         ->cascadeOnDelete();
-
-    //     $table->timestamps();
-    // });
+            $table->index(['id_apprenant', 'statut']);
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('paiemants');
+        Schema::dropIfExists('paiements');
     }
 };
